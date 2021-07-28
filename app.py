@@ -4,7 +4,7 @@ st.set_page_config(layout="wide")
 from app import st_custom_table
 from mdb import mdb_aggregate
 
-
+pos = ["LF", "GK", "RCM", "CB", "RW", "LW", "LB", "RF", "RS", "LDM", "RAM", "RB", "CM", "ST", "LS", "LM", "CF", "RDM", "RM","CAM","LCM", "LWB", "CDM", "RWB","RCB","LCB", "LAM"]
 options = st.sidebar.selectbox("Options", ["Country", "Club"])
 
 if options == "Country":
