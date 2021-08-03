@@ -1,20 +1,35 @@
-from re import S
-import streamlit as st
-from app import st_custom_slider
 from mdb import mdb_aggregate
-import json
-from bson import json_util
+from app import st_custom_table
+import streamlit as st
+# st.set_page_config(layout="wide")
 
-countries = (mdb_aggregate.get_country_all())
-# Need session state because get_country_all returns values not in order each time
-if "countries" not in st.session_state:
-    st.session_state["countries"] = countries
-country_select = st.sidebar.selectbox(
-    "Select Country", st.session_state.countries, 0)
+pos = ["None", "LF", "GK", "RCM", "CB", "RW", "LW", "LB", "RF", "RS", "LDM", "RAM", "RB", "CM", "ST",
+       "LS", "LM", "CF", "RDM", "RM", "CAM", "LCM", "LWB", "CDM", "RWB", "RCB", "LCB", "LAM"]
+options = st.sidebar.selectbox("Options", ["Country", "Club"])
 
-# test = json.dumps(test, default=json_util.default)
-# v_custom = st_custom_slider(test, 0, 100, 50, key="slider1")
-# st.write(v_custom)
-if country_select:
-    country_players = mdb_aggregate.get_players_from_country(country_select)
-    st.write(country_players)
+if options == "Country":
+    countries = mdb_aggregate.get_country_all()
+    country_select = st.sidebar.selectbox(
+        "Select Country", countries, 0)
+
+    if country_select:
+        players = mdb_aggregate.get_players_from_country(country_select)
+        filter_club = st.sidebar.selectbox("Filter Club", players[1], 0)
+        filter_pos = st.sidebar.selectbox("Filter Position", pos, 0)
+        if filter_club:
+            data = mdb_aggregate.get_players_from_country_filter(
+                country_select, filter_club, filter_pos)
+            # react_custom = st_custom_table(data)
+            if type(data) is tuple:
+                st_custom_table(data[0])
+            elif type(data) is not tuple:
+                st_custom_table(data)
+
+
+elif options == "Club":
+    clubs = mdb_aggregate.get_clubs_all()
+    club_select = st.sidebar.selectbox("Clubs", clubs)
+
+    if club_select:
+        players = mdb_aggregate.get_players_from_club(club_select)
+        react_custom = st_custom_table(players)
