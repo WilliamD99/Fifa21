@@ -1,11 +1,12 @@
 from mdb import mdb_aggregate
 from app import st_custom_table
 import streamlit as st
-# st.set_page_config(layout="wide")
+st.set_page_config(layout="wide")
+
 
 pos = ["None", "LF", "GK", "RCM", "CB", "RW", "LW", "LB", "RF", "RS", "LDM", "RAM", "RB", "CM", "ST",
        "LS", "LM", "CF", "RDM", "RM", "CAM", "LCM", "LWB", "CDM", "RWB", "RCB", "LCB", "LAM"]
-options = st.sidebar.selectbox("Options", ["Country", "Club"])
+options = st.sidebar.selectbox("Options", ["Country", "Search"])
 
 if options == "Country":
     countries = mdb_aggregate.get_country_all()
@@ -26,10 +27,16 @@ if options == "Country":
                 st_custom_table(data)
 
 
-elif options == "Club":
-    clubs = mdb_aggregate.get_clubs_all()
-    club_select = st.sidebar.selectbox("Clubs", clubs)
+# elif options == "Club":
+#     clubs = mdb_aggregate.get_clubs_all()
+#     club_select = st.sidebar.selectbox("Clubs", clubs)
 
-    if club_select:
-        players = mdb_aggregate.get_players_from_club(club_select)
-        react_custom = st_custom_table(players)
+#     if club_select:
+#         players = mdb_aggregate.get_players_from_club(club_select)
+#         react_custom = st_custom_table(players)
+
+elif options == "Search":
+    search_input = st.sidebar.text_input("Search player")
+    if search_input:
+        players = mdb_aggregate.get_player_from_search(search_input)
+        st_custom_table(players)

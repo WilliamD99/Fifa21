@@ -6,41 +6,26 @@ import streamlit as st
 load_dotenv()
 SRV = os.getenv("SRV")
 mdb = mongodb(srv_link=SRV)
-mdb.config("myFirstDatabase", "fifa21")
+mdb.config("myFirstDatabase", "test")
 
 
 # @st.cache(suppress_st_warning=True)
 class mdb_aggregate:
-    def __init__(self):
+    def __init__(_self):
         return None
 
-    def get_player(self, name):
-        pipeline = [
-            {
-                "$project": {
-                    "_id": 0
-                }
-            },
-            {
-                "$match": {
-                    "Name": name
-                }
-            }
-        ]
-        results = list(mdb.aggregate(pipeline))
-        return results
-
-    def get_clubs_all(self):
+    @st.experimental_memo
+    def get_clubs_all(_self):
         pipeline = [
             {
                 "$project": {
                     "_id": 0,
-                    "Club": 1
+                    "club_name": 1
                 }
             },
             {
                 "$group": {
-                    "_id": "$Club"
+                    "_id": "$club_name"
                 }
             },
             {
@@ -55,29 +40,22 @@ class mdb_aggregate:
             results_lst.append(data["_id"])
         return results_lst
 
-    def get_players_from_club(self, club):
+    @st.experimental_memo
+    def get_players_from_club(_self, club):
         pipeline = [
             {
                 "$project": {
                     "_id": 0,
-                    "Name": 1,
-                    "Age": 1,
-                    "Club": 1,
-                    "Club Logo": 1,
-                    "Photo": 1,
-                    "Position": 1,
-                    "Nationality": 1,
-                    "Overall": 1
                 }
             },
             {
                 "$match": {
-                    "Club": club
+                    "club_name": club
                 }
             },
             {
                 "$group": {
-                    "_id": "$Club",
+                    "_id": "$club_name",
                     "players": {
                         "$push": {
                             "name": "$Name",
@@ -101,17 +79,18 @@ class mdb_aggregate:
         results = list(mdb.aggregate(pipeline))
         return results
 
-    def get_country_all(self):
+    @st.experimental_memo
+    def get_country_all(_self):
         pipeline = [
             {
                 "$project": {
                     "_id": 0,
-                    "Nationality": 1
+                    "nationality": 1
                 }
             },
             {
                 "$group": {
-                    "_id": "$Nationality"
+                    "_id": "$nationality"
                 }
             },
             {
@@ -127,7 +106,8 @@ class mdb_aggregate:
             results_lst.append(data["_id"])
         return results_lst
 
-    def get_players_from_country(self, country):
+    @st.experimental_memo
+    def get_players_from_country(_self, country):
         pipeline = [
             {
                 "$project": {
@@ -136,101 +116,112 @@ class mdb_aggregate:
             },
             {
                 "$match": {
-                    "Nationality": country
+                    "nationality": country
                 }
             },
             {
                 "$group": {
-                    "_id": "$Club",
+                    "_id": "$club_name",
                     "players": {
                         "$push": {
-                            "name": "$Name",
-                            "age": "$Age",
-                            "height": "$Height",
-                            "weight": "$Weight",
+                            "name": "$short_name",
+                            "age": "$age",
+                            "height": "$height_cm",
+                            "weight": "$weight_kg",
                             "photo": "$Photo",
-                            "position": "$Position",
-                            "overall": "$Overall"
+                            "position": "$team_position",
+                            "overall": "$overall"
                         }
                     },
                     "details": {
                         "$push": {
-                            "value": "$Value",
+                            "value": "$value_eur",
+                            "wage": "$wage_eur",
+                            "release_clause_eur": "$release_clause_eur",
+                            "long_name": "$long_name",
+                            "dob": "$dob",
+                            "player_positions": "$player_positions",
+                            "potential": "$potential",
+                            "preferred_foot": "$preferred_foot",
+                            "player_tags": "$player_tags",
+                            "club": "$club_name",
+                            "international_reputation": "$international_reputation",
+                            "weak_foot": "$weak_foot",
+                            "skill_moves": "$skill_moves",
                             "pos": {
-                                "LS": "$LS",
-                                "ST": "$ST",
-                                "RS": "$RS",
-                                "LW": "$LW",
-                                "LF": "$LF",
-                                "CF": "$CF",
-                                "RF": "$RF",
-                                "RW": "$RW",
-                                "LAM": "$LAM",
-                                "CAM": "$CAM",
-                                "RAM": "$RAM",
-                                "LM": "$LM",
-                                "LCM": "$LCM",
-                                "CM": "$CM",
-                                "RCM": "$RCM",
-                                "RM": "$RM",
-                                "LWB": "$LWB",
-                                "LDM": "$LDM",
-                                "CDM": "$CDM",
-                                "RDM": "$RDM",
-                                "RWB": "$RWB",
-                                "LB": "$LB",
-                                "LCB": "$LCB",
-                                "CB": "$CB",
-                                "RCB": "$RCB",
-                                "RB": "$RB",
-                                "GK": "$GK",
+                                "LS": "$ls",
+                                "ST": "$st",
+                                "RS": "$rs",
+                                "LW": "$lw",
+                                "LF": "$lf",
+                                "CF": "$cf",
+                                "RF": "$rf",
+                                "RW": "$rw",
+                                "LAM": "$lam",
+                                "CAM": "$cam",
+                                "RAM": "$ram",
+                                "LM": "$lm",
+                                "LCM": "$lcm",
+                                "CM": "$cm",
+                                "RCM": "$rcm",
+                                "RM": "$rm",
+                                "LWB": "$lwb",
+                                "LDM": "$ldm",
+                                "CDM": "$cdm",
+                                "RDM": "$rdm",
+                                "RWB": "$rwb",
+                                "LB": "$lb",
+                                "LCB": "$lcb",
+                                "CB": "$cb",
+                                "RCB": "$rcb",
+                                "RB": "$rb",
+                                "GK": "$gk",
+                                "trait": "$player_traits"
                             },
                             "stats": {
-                                "Crossing": "$Crossing",
-                                "Finishing": "$Finishing",
-                                "Heading Accuracy": "$Heading Accuracy",
-                                "Short Passing": "$Shot Passing",
-                                "Volleys": "$Volleys",
-                                "Dribbling": "$Dribbling",
-                                "Curve": "$Curve",
-                                "FK Accuracy": "$FK Accuracy",
-                                "Long Passing": "$Long Passing",
-                                "Ball Control": "$Ball Control",
-                                "Acceleration": "$Acceleration",
-                                "Sprint Speed": "$Sprint Speed",
-                                "Agility": "$Agility",
-                                "Reactions": "$Reactions",
-                                "Balance": "$Balance",
-                                "Shot Power": "$Shot Power",
-                                "Jumping": "$Jumping",
-                                "Stamina": "$Stamina",
-                                "Strength": "$Strength",
-                                "Long Shots": "$Long Shots",
-                                "Aggression": "$Aggression",
-                                "Interceptions": "$Interceptions",
-                                "Positioning": "$Positioning",
-                                "Vision": "$Vision",
-                                "Penalties": "$Penalties",
-                                "Composure": "$Composure",
+                                "pace": "$pace",
+                                "shooting": "$shooting",
+                                "passing": "$passing",
+                                "dribbling": "$dribbling",
+                                "defending": "$defending",
+                                "physic": "$physic",
+                                "Crossing": "$attacking_crossing",
+                                "Finishing": "$attacking_finishing",
+                                "Heading Accuracy": "$attacking_heading_accuracy",
+                                "Short Passing": "$attacking_short_passing",
+                                "Volleys": "$attacking_volleys",
+                                "Dribbling": "$skill_dribbling",
+                                "Curve": "$skill_curve",
+                                "FK Accuracy": "$skill_fk_accuracy",
+                                "Long Passing": "$skill_long_passing",
+                                "Ball Control": "$skill_ball_control",
+                                "Acceleration": "$movement_acceleration",
+                                "Sprint Speed": "$movement_sprint_speed",
+                                "Agility": "$movement_agility",
+                                "Reactions": "$movement_reactions",
+                                "Balance": "$movement_balance",
+                                "Shot Power": "$power_shot_power",
+                                "Jumping": "$power_jumping",
+                                "Stamina": "$power_stamina",
+                                "Strength": "$power_strength",
+                                "Long Shots": "$power_long_shots",
+                                "Aggression": "$mentality_aggression",
+                                "Interceptions": "$mentality_interceptions",
+                                "Positioning": "$mentality_positioning",
+                                "Vision": "$mentality_vision",
+                                "Penalties": "$mentality_penalties",
+                                "Composure": "$mentality_composure",
                                 "Defensive Awareness": "$Defensive Awareness",
-                                "Standing Tackle": "$Standing Tackle",
-                                "Sliding Tackle": "$Sliding Tackle",
-                                "GK Diving": "$GK Diving",
-                                "GK Handling": "$GK Handling",
-                                "GK Kicking": "$GK Kicking",
-                                "GK Positioning": "$GK Positioning",
-                                "GK Reflexes": "$GK Reflexes"
+                                "Standing Tackle": "$defending_standing_tackle",
+                                "Sliding Tackle": "$defending_sliding_tackle",
+                                "GK Diving": "$goalkeeping_diving",
+                                "GK Handling": "$goalkeeping_handling",
+                                "GK Kicking": "$goalkeeping_kicking",
+                                "GK Positioning": "$goalkeeping_positioning",
+                                "GK Reflexes": "$goalkeeping_reflexes"
                             }
                         }
                     },
-                    "logo": {
-                        "$first": "$Club Logo"
-                    }
-                }
-            },
-            {
-                "$sort": {
-                    "logo": 1
                 }
             }
         ]
@@ -240,10 +231,12 @@ class mdb_aggregate:
             club_filter.append(data["_id"])
         return results, club_filter
 
-    def get_players_from_country_filter(self, country, club, pos):
+    @st.experimental_memo
+    def get_players_from_country_filter(_self, country, club, pos):
         if club == "None" and pos == "None":
-            return self.get_players_from_country(country)
+            return _self.get_players_from_country(country)
         elif club != "None" and pos == "None":
+            st.write("Test")
             pipeline = [
                 {
                     "$project": {
@@ -252,8 +245,8 @@ class mdb_aggregate:
                 },
                 {
                     "$match": {
-                        "Nationality": country,
-                        "Club": club
+                        "nationality": country,
+                        "club_name": club
                     }
                 },
                 {
@@ -261,90 +254,104 @@ class mdb_aggregate:
                         "_id": "$Nationality",
                         "players": {
                             "$push": {
-                                "name": "$Name",
-                                "age": "$Age",
+                                "name": "$short_name",
+                                "age": "$age",
                                 "photo": "$Photo",
-                                "position": "$Position",
-                                "overall": "$Overall"
+                                "position": "$team_position",
+                                "overall": "$overall",
+                                "height": "$height_cm",
+                                "weight": "$weight_kg"
                             }
                         },
                         "details": {
                             "$push": {
-                                "value": "$Value",
+                                "value": "$value_eur",
+                                "wage": "$wage_eur",
+                                "release_clause_eur": "$release_clause_eur",
+                                "long_name": "$long_name",
+                                "dob": "$dob",
+                                "player_positions": "$player_positions",
+                                "potential": "$potential",
+                                "preferred_foot": "$preferred_foot",
+                                "player_tags": "$player_tags",
+                                "club": "$club_name",
+                                "international_reputation": "$international_reputation",
+                                "weak_foot": "$weak_foot",
+                                "skill_moves": "$skill_moves",
                                 "pos": {
-                                    "LS": "$LS",
-                                    "ST": "$ST",
-                                    "RS": "$RS",
-                                    "LW": "$LW",
-                                    "LF": "$LF",
-                                    "CF": "$CF",
-                                    "RF": "$RF",
-                                    "RW": "$RW",
-                                    "LAM": "$LAM",
-                                    "CAM": "$CAM",
-                                    "RAM": "$RAM",
-                                    "LM": "$LM",
-                                    "LCM": "$LCM",
-                                    "CM": "$CM",
-                                    "RCM": "$RCM",
-                                    "RM": "$RM",
-                                    "LWB": "$LWB",
-                                    "LDM": "$LDM",
-                                    "CDM": "$CDM",
-                                    "RDM": "$RDM",
-                                    "RWB": "$RWB",
-                                    "LB": "$LB",
-                                    "LCB": "$LCB",
-                                    "CB": "$CB",
-                                    "RCB": "$RCB",
-                                    "RB": "$RB",
-                                    "GK": "$GK",
+                                    "LS": "$ls",
+                                    "ST": "$st",
+                                    "RS": "$rs",
+                                    "LW": "$lw",
+                                    "LF": "$lf",
+                                    "CF": "$cf",
+                                    "RF": "$rf",
+                                    "RW": "$rw",
+                                    "LAM": "$lam",
+                                    "CAM": "$cam",
+                                    "RAM": "$ram",
+                                    "LM": "$lm",
+                                    "LCM": "$lcm",
+                                    "CM": "$cm",
+                                    "RCM": "$rcm",
+                                    "RM": "$rm",
+                                    "LWB": "$lwb",
+                                    "LDM": "$ldm",
+                                    "CDM": "$cdm",
+                                    "RDM": "$rdm",
+                                    "RWB": "$rwb",
+                                    "LB": "$lb",
+                                    "LCB": "$lcb",
+                                    "CB": "$cb",
+                                    "RCB": "$rcb",
+                                    "RB": "$rb",
+                                    "GK": "$gk",
+                                    "trait": "$player_traits"
                                 },
                                 "stats": {
-                                    "Crossing": "$Crossing",
-                                    "Finishing": "$Finishing",
-                                    "Heading Accuracy": "$Heading Accuracy",
-                                    "Short Passing": "$Shot Passing",
-                                    "Volleys": "$Volleys",
-                                    "Dribbling": "$Dribbling",
-                                    "Curve": "$Curve",
-                                    "FK Accuracy": "$FK Accuracy",
-                                    "Long Passing": "$Long Passing",
-                                    "Ball Control": "$Ball Control",
-                                    "Acceleration": "$Acceleration",
-                                    "Sprint Speed": "$Sprint Speed",
-                                    "Agility": "$Agility",
-                                    "Reactions": "$Reactions",
-                                    "Balance": "$Balance",
-                                    "Shot Power": "$Shot Power",
-                                    "Jumping": "$Jumping",
-                                    "Stamina": "$Stamina",
-                                    "Strength": "$Strength",
-                                    "Long Shots": "$Long Shots",
-                                    "Aggression": "$Aggression",
-                                    "Interceptions": "$Interceptions",
-                                    "Positioning": "$Positioning",
-                                    "Vision": "$Vision",
-                                    "Penalties": "$Penalties",
-                                    "Composure": "$Composure",
+                                    "pace": "$pace",
+                                    "shooting": "$shooting",
+                                    "passing": "$passing",
+                                    "dribbling": "$dribbling",
+                                    "defending": "$defending",
+                                    "physic": "$physic",
+                                    "Crossing": "$attacking_crossing",
+                                    "Finishing": "$attacking_finishing",
+                                    "Heading Accuracy": "$attacking_heading_accuracy",
+                                    "Short Passing": "$attacking_short_passing",
+                                    "Volleys": "$attacking_volleys",
+                                    "Dribbling": "$skill_dribbling",
+                                    "Curve": "$skill_curve",
+                                    "FK Accuracy": "$skill_fk_accuracy",
+                                    "Long Passing": "$skill_long_passing",
+                                    "Ball Control": "$skill_ball_control",
+                                    "Acceleration": "$movement_acceleration",
+                                    "Sprint Speed": "$movement_sprint_speed",
+                                    "Agility": "$movement_agility",
+                                    "Reactions": "$movement_reactions",
+                                    "Balance": "$movement_balance",
+                                    "Shot Power": "$power_shot_power",
+                                    "Jumping": "$power_jumping",
+                                    "Stamina": "$power_stamina",
+                                    "Strength": "$power_strength",
+                                    "Long Shots": "$power_long_shots",
+                                    "Aggression": "$mentality_aggression",
+                                    "Interceptions": "$mentality_interceptions",
+                                    "Positioning": "$mentality_positioning",
+                                    "Vision": "$mentality_vision",
+                                    "Penalties": "$mentality_penalties",
+                                    "Composure": "$mentality_composure",
                                     "Defensive Awareness": "$Defensive Awareness",
-                                    "Standing Tackle": "$Standing Tackle",
-                                    "Sliding Tackle": "$Sliding Tackle",
-                                    "GK Diving": "$GK Diving",
-                                    "GK Handling": "$GK Handling",
-                                    "GK Kicking": "$GK Kicking",
-                                    "GK Positioning": "$GK Positioning",
-                                    "GK Reflexes": "$GK Reflexes"
+                                    "Standing Tackle": "$defending_standing_tackle",
+                                    "Sliding Tackle": "$defending_sliding_tackle",
+                                    "GK Diving": "$goalkeeping_diving",
+                                    "GK Handling": "$goalkeeping_handling",
+                                    "GK Kicking": "$goalkeeping_kicking",
+                                    "GK Positioning": "$goalkeeping_positioning",
+                                    "GK Reflexes": "$goalkeeping_reflexes"
                                 }
                             }
-                        },
-                    }
-                },
-                {
-                    "$sort": {
-                        "Name": 1
-                    }
-                }
+                        }, }}
             ]
 
         elif club != "None" and pos != "None":
@@ -356,9 +363,9 @@ class mdb_aggregate:
                 },
                 {
                     "$match": {
-                        "Nationality": country,
-                        "Club": club,
-                        "Position": pos
+                        "nationality": country,
+                        "club_name": club,
+                        "team_position": pos
                     }
                 },
                 {
@@ -366,90 +373,104 @@ class mdb_aggregate:
                         "_id": "$Nationality",
                         "players": {
                             "$push": {
-                                "name": "$Name",
-                                "age": "$Age",
+                                "name": "$short_name",
+                                "age": "$age",
                                 "photo": "$Photo",
-                                "position": "$Position",
-                                "overall": "$Overall"
+                                "position": "$team_position",
+                                "overall": "$overall",
+                                "height": "$height_cm",
+                                "weight": "$weight_kg"
                             }
                         },
                         "details": {
                             "$push": {
-                                "value": "$Value",
+                                "value": "$value_eur",
+                                "wage": "$wage_eur",
+                                "release_clause_eur": "$release_clause_eur",
+                                "long_name": "$long_name",
+                                "dob": "$dob",
+                                "player_positions": "$player_positions",
+                                "potential": "$potential",
+                                "preferred_foot": "$preferred_foot",
+                                "player_tags": "$player_tags",
+                                "club": "$club_name",
+                                "international_reputation": "$international_reputation",
+                                "weak_foot": "$weak_foot",
+                                "skill_moves": "$skill_moves",
                                 "pos": {
-                                    "LS": "$LS",
-                                    "ST": "$ST",
-                                    "RS": "$RS",
-                                    "LW": "$LW",
-                                    "LF": "$LF",
-                                    "CF": "$CF",
-                                    "RF": "$RF",
-                                    "RW": "$RW",
-                                    "LAM": "$LAM",
-                                    "CAM": "$CAM",
-                                    "RAM": "$RAM",
-                                    "LM": "$LM",
-                                    "LCM": "$LCM",
-                                    "CM": "$CM",
-                                    "RCM": "$RCM",
-                                    "RM": "$RM",
-                                    "LWB": "$LWB",
-                                    "LDM": "$LDM",
-                                    "CDM": "$CDM",
-                                    "RDM": "$RDM",
-                                    "RWB": "$RWB",
-                                    "LB": "$LB",
-                                    "LCB": "$LCB",
-                                    "CB": "$CB",
-                                    "RCB": "$RCB",
-                                    "RB": "$RB",
-                                    "GK": "$GK",
+                                    "LS": "$ls",
+                                    "ST": "$st",
+                                    "RS": "$rs",
+                                    "LW": "$lw",
+                                    "LF": "$lf",
+                                    "CF": "$cf",
+                                    "RF": "$rf",
+                                    "RW": "$rw",
+                                    "LAM": "$lam",
+                                    "CAM": "$cam",
+                                    "RAM": "$ram",
+                                    "LM": "$lm",
+                                    "LCM": "$lcm",
+                                    "CM": "$cm",
+                                    "RCM": "$rcm",
+                                    "RM": "$rm",
+                                    "LWB": "$lwb",
+                                    "LDM": "$ldm",
+                                    "CDM": "$cdm",
+                                    "RDM": "$rdm",
+                                    "RWB": "$rwb",
+                                    "LB": "$lb",
+                                    "LCB": "$lcb",
+                                    "CB": "$cb",
+                                    "RCB": "$rcb",
+                                    "RB": "$rb",
+                                    "GK": "$gk",
+                                    "trait": "$player_traits"
                                 },
                                 "stats": {
-                                    "Crossing": "$Crossing",
-                                    "Finishing": "$Finishing",
-                                    "Heading Accuracy": "$Heading Accuracy",
-                                    "Short Passing": "$Shot Passing",
-                                    "Volleys": "$Volleys",
-                                    "Dribbling": "$Dribbling",
-                                    "Curve": "$Curve",
-                                    "FK Accuracy": "$FK Accuracy",
-                                    "Long Passing": "$Long Passing",
-                                    "Ball Control": "$Ball Control",
-                                    "Acceleration": "$Acceleration",
-                                    "Sprint Speed": "$Sprint Speed",
-                                    "Agility": "$Agility",
-                                    "Reactions": "$Reactions",
-                                    "Balance": "$Balance",
-                                    "Shot Power": "$Shot Power",
-                                    "Jumping": "$Jumping",
-                                    "Stamina": "$Stamina",
-                                    "Strength": "$Strength",
-                                    "Long Shots": "$Long Shots",
-                                    "Aggression": "$Aggression",
-                                    "Interceptions": "$Interceptions",
-                                    "Positioning": "$Positioning",
-                                    "Vision": "$Vision",
-                                    "Penalties": "$Penalties",
-                                    "Composure": "$Composure",
+                                    "pace": "$pace",
+                                    "shooting": "$shooting",
+                                    "passing": "$passing",
+                                    "dribbling": "$dribbling",
+                                    "defending": "$defending",
+                                    "physic": "$physic",
+                                    "Crossing": "$attacking_crossing",
+                                    "Finishing": "$attacking_finishing",
+                                    "Heading Accuracy": "$attacking_heading_accuracy",
+                                    "Short Passing": "$attacking_short_passing",
+                                    "Volleys": "$attacking_volleys",
+                                    "Dribbling": "$skill_dribbling",
+                                    "Curve": "$skill_curve",
+                                    "FK Accuracy": "$skill_fk_accuracy",
+                                    "Long Passing": "$skill_long_passing",
+                                    "Ball Control": "$skill_ball_control",
+                                    "Acceleration": "$movement_acceleration",
+                                    "Sprint Speed": "$movement_sprint_speed",
+                                    "Agility": "$movement_agility",
+                                    "Reactions": "$movement_reactions",
+                                    "Balance": "$movement_balance",
+                                    "Shot Power": "$power_shot_power",
+                                    "Jumping": "$power_jumping",
+                                    "Stamina": "$power_stamina",
+                                    "Strength": "$power_strength",
+                                    "Long Shots": "$power_long_shots",
+                                    "Aggression": "$mentality_aggression",
+                                    "Interceptions": "$mentality_interceptions",
+                                    "Positioning": "$mentality_positioning",
+                                    "Vision": "$mentality_vision",
+                                    "Penalties": "$mentality_penalties",
+                                    "Composure": "$mentality_composure",
                                     "Defensive Awareness": "$Defensive Awareness",
-                                    "Standing Tackle": "$Standing Tackle",
-                                    "Sliding Tackle": "$Sliding Tackle",
-                                    "GK Diving": "$GK Diving",
-                                    "GK Handling": "$GK Handling",
-                                    "GK Kicking": "$GK Kicking",
-                                    "GK Positioning": "$GK Positioning",
-                                    "GK Reflexes": "$GK Reflexes"
+                                    "Standing Tackle": "$defending_standing_tackle",
+                                    "Sliding Tackle": "$defending_sliding_tackle",
+                                    "GK Diving": "$goalkeeping_diving",
+                                    "GK Handling": "$goalkeeping_handling",
+                                    "GK Kicking": "$goalkeeping_kicking",
+                                    "GK Positioning": "$goalkeeping_positioning",
+                                    "GK Reflexes": "$goalkeeping_reflexes"
                                 }
                             }
-                        },
-                    }
-                },
-                {
-                    "$sort": {
-                        "Name": 1
-                    }
-                }
+                        }, }}
             ]
         elif club == "None" and pos != "None":
             pipeline = [
@@ -460,8 +481,8 @@ class mdb_aggregate:
                 },
                 {
                     "$match": {
-                        "Nationality": country,
-                        "Position": pos
+                        "nationality": country,
+                        "team_position": pos
                     }
                 },
                 {
@@ -469,91 +490,228 @@ class mdb_aggregate:
                         "_id": "$Nationality",
                         "players": {
                             "$push": {
-                                "name": "$Name",
-                                "age": "$Age",
+                                "name": "$short_name",
+                                "age": "$age",
                                 "photo": "$Photo",
-                                "position": "$Position",
-                                "overall": "$Overall"
+                                "position": "$team_position",
+                                "overall": "$overall",
+                                "height": "$height_cm",
+                                "weight": "$weight_kg"
                             }
                         },
                         "details": {
                             "$push": {
-                                "value": "$Value",
+                                "value": "$value_eur",
+                                "wage": "$wage_eur",
+                                "release_clause_eur": "$release_clause_eur",
+                                "long_name": "$long_name",
+                                "dob": "$dob",
+                                "player_positions": "$player_positions",
+                                "potential": "$potential",
+                                "preferred_foot": "$preferred_foot",
+                                "player_tags": "$player_tags",
+                                "club": "$club_name",
+                                "international_reputation": "$international_reputation",
+                                "weak_foot": "$weak_foot",
+                                "skill_moves": "$skill_moves",
                                 "pos": {
-                                    "LS": "$LS",
-                                    "ST": "$ST",
-                                    "RS": "$RS",
-                                    "LW": "$LW",
-                                    "LF": "$LF",
-                                    "CF": "$CF",
-                                    "RF": "$RF",
-                                    "RW": "$RW",
-                                    "LAM": "$LAM",
-                                    "CAM": "$CAM",
-                                    "RAM": "$RAM",
-                                    "LM": "$LM",
-                                    "LCM": "$LCM",
-                                    "CM": "$CM",
-                                    "RCM": "$RCM",
-                                    "RM": "$RM",
-                                    "LWB": "$LWB",
-                                    "LDM": "$LDM",
-                                    "CDM": "$CDM",
-                                    "RDM": "$RDM",
-                                    "RWB": "$RWB",
-                                    "LB": "$LB",
-                                    "LCB": "$LCB",
-                                    "CB": "$CB",
-                                    "RCB": "$RCB",
-                                    "RB": "$RB",
-                                    "GK": "$GK",
+                                    "LS": "$ls",
+                                    "ST": "$st",
+                                    "RS": "$rs",
+                                    "LW": "$lw",
+                                    "LF": "$lf",
+                                    "CF": "$cf",
+                                    "RF": "$rf",
+                                    "RW": "$rw",
+                                    "LAM": "$lam",
+                                    "CAM": "$cam",
+                                    "RAM": "$ram",
+                                    "LM": "$lm",
+                                    "LCM": "$lcm",
+                                    "CM": "$cm",
+                                    "RCM": "$rcm",
+                                    "RM": "$rm",
+                                    "LWB": "$lwb",
+                                    "LDM": "$ldm",
+                                    "CDM": "$cdm",
+                                    "RDM": "$rdm",
+                                    "RWB": "$rwb",
+                                    "LB": "$lb",
+                                    "LCB": "$lcb",
+                                    "CB": "$cb",
+                                    "RCB": "$rcb",
+                                    "RB": "$rb",
+                                    "GK": "$gk",
+                                    "trait": "$player_traits"
                                 },
                                 "stats": {
-                                    "Crossing": "$Crossing",
-                                    "Finishing": "$Finishing",
-                                    "Heading Accuracy": "$Heading Accuracy",
-                                    "Short Passing": "$Shot Passing",
-                                    "Volleys": "$Volleys",
-                                    "Dribbling": "$Dribbling",
-                                    "Curve": "$Curve",
-                                    "FK Accuracy": "$FK Accuracy",
-                                    "Long Passing": "$Long Passing",
-                                    "Ball Control": "$Ball Control",
-                                    "Acceleration": "$Acceleration",
-                                    "Sprint Speed": "$Sprint Speed",
-                                    "Agility": "$Agility",
-                                    "Reactions": "$Reactions",
-                                    "Balance": "$Balance",
-                                    "Shot Power": "$Shot Power",
-                                    "Jumping": "$Jumping",
-                                    "Stamina": "$Stamina",
-                                    "Strength": "$Strength",
-                                    "Long Shots": "$Long Shots",
-                                    "Aggression": "$Aggression",
-                                    "Interceptions": "$Interceptions",
-                                    "Positioning": "$Positioning",
-                                    "Vision": "$Vision",
-                                    "Penalties": "$Penalties",
-                                    "Composure": "$Composure",
+                                    "pace": "$pace",
+                                    "shooting": "$shooting",
+                                    "passing": "$passing",
+                                    "dribbling": "$dribbling",
+                                    "defending": "$defending",
+                                    "physic": "$physic",
+                                    "Crossing": "$attacking_crossing",
+                                    "Finishing": "$attacking_finishing",
+                                    "Heading Accuracy": "$attacking_heading_accuracy",
+                                    "Short Passing": "$attacking_short_passing",
+                                    "Volleys": "$attacking_volleys",
+                                    "Dribbling": "$skill_dribbling",
+                                    "Curve": "$skill_curve",
+                                    "FK Accuracy": "$skill_fk_accuracy",
+                                    "Long Passing": "$skill_long_passing",
+                                    "Ball Control": "$skill_ball_control",
+                                    "Acceleration": "$movement_acceleration",
+                                    "Sprint Speed": "$movement_sprint_speed",
+                                    "Agility": "$movement_agility",
+                                    "Reactions": "$movement_reactions",
+                                    "Balance": "$movement_balance",
+                                    "Shot Power": "$power_shot_power",
+                                    "Jumping": "$power_jumping",
+                                    "Stamina": "$power_stamina",
+                                    "Strength": "$power_strength",
+                                    "Long Shots": "$power_long_shots",
+                                    "Aggression": "$mentality_aggression",
+                                    "Interceptions": "$mentality_interceptions",
+                                    "Positioning": "$mentality_positioning",
+                                    "Vision": "$mentality_vision",
+                                    "Penalties": "$mentality_penalties",
+                                    "Composure": "$mentality_composure",
                                     "Defensive Awareness": "$Defensive Awareness",
-                                    "Standing Tackle": "$Standing Tackle",
-                                    "Sliding Tackle": "$Sliding Tackle",
-                                    "GK Diving": "$GK Diving",
-                                    "GK Handling": "$GK Handling",
-                                    "GK Kicking": "$GK Kicking",
-                                    "GK Positioning": "$GK Positioning",
-                                    "GK Reflexes": "$GK Reflexes"
+                                    "Standing Tackle": "$defending_standing_tackle",
+                                    "Sliding Tackle": "$defending_sliding_tackle",
+                                    "GK Diving": "$goalkeeping_diving",
+                                    "GK Handling": "$goalkeeping_handling",
+                                    "GK Kicking": "$goalkeeping_kicking",
+                                    "GK Positioning": "$goalkeeping_positioning",
+                                    "GK Reflexes": "$goalkeeping_reflexes"
                                 }
                             }
-                        },
-                    }
-                },
-                {
-                    "$sort": {
-                        "Name": 1
+                        }, }}
+            ]
+        results = list(mdb.aggregate(pipeline))
+        return results
+
+    @st.experimental_memo
+    def get_player_from_search(_self, query):
+        pipeline = [
+            {
+                "$project": {
+                    "_id": 0
+                }
+            },
+            {
+                "$match": {
+                    "short_name": {
+                        "$regex": query
                     }
                 }
-            ]
+            },
+            {
+                "$group": {
+                    "_id": "$club_name",
+                    "players": {
+                        "$push": {
+                            "name": "$short_name",
+                            "age": "$age",
+                            "height": "$height_cm",
+                            "weight": "$weight_kg",
+                            "photo": "$Photo",
+                            "position": "$team_position",
+                            "overall": "$overall"
+                        }
+                    },
+                    "details": {
+                        "$push": {
+                            "value": "$value_eur",
+                            "wage": "$wage_eur",
+                            "release_clause_eur": "$release_clause_eur",
+                            "long_name": "$long_name",
+                            "dob": "$dob",
+                            "player_positions": "$player_positions",
+                            "potential": "$potential",
+                            "preferred_foot": "$preferred_foot",
+                            "player_tags": "$player_tags",
+                            "club": "$club_name",
+                            "international_reputation": "$international_reputation",
+                            "weak_foot": "$weak_foot",
+                            "skill_moves": "$skill_moves",
+                            "pos": {
+                                "LS": "$ls",
+                                "ST": "$st",
+                                "RS": "$rs",
+                                "LW": "$lw",
+                                "LF": "$lf",
+                                "CF": "$cf",
+                                "RF": "$rf",
+                                "RW": "$rw",
+                                "LAM": "$lam",
+                                "CAM": "$cam",
+                                "RAM": "$ram",
+                                "LM": "$lm",
+                                "LCM": "$lcm",
+                                "CM": "$cm",
+                                "RCM": "$rcm",
+                                "RM": "$rm",
+                                "LWB": "$lwb",
+                                "LDM": "$ldm",
+                                "CDM": "$cdm",
+                                "RDM": "$rdm",
+                                "RWB": "$rwb",
+                                "LB": "$lb",
+                                "LCB": "$lcb",
+                                "CB": "$cb",
+                                "RCB": "$rcb",
+                                "RB": "$rb",
+                                "GK": "$gk",
+                                "trait": "$player_traits"
+                            },
+                            "stats": {
+                                "pace": "$pace",
+                                "shooting": "$shooting",
+                                "passing": "$passing",
+                                "dribbling": "$dribbling",
+                                "defending": "$defending",
+                                "physic": "$physic",
+                                "Crossing": "$attacking_crossing",
+                                "Finishing": "$attacking_finishing",
+                                "Heading Accuracy": "$attacking_heading_accuracy",
+                                "Short Passing": "$attacking_short_passing",
+                                "Volleys": "$attacking_volleys",
+                                "Dribbling": "$skill_dribbling",
+                                "Curve": "$skill_curve",
+                                "FK Accuracy": "$skill_fk_accuracy",
+                                "Long Passing": "$skill_long_passing",
+                                "Ball Control": "$skill_ball_control",
+                                "Acceleration": "$movement_acceleration",
+                                "Sprint Speed": "$movement_sprint_speed",
+                                "Agility": "$movement_agility",
+                                "Reactions": "$movement_reactions",
+                                "Balance": "$movement_balance",
+                                "Shot Power": "$power_shot_power",
+                                "Jumping": "$power_jumping",
+                                "Stamina": "$power_stamina",
+                                "Strength": "$power_strength",
+                                "Long Shots": "$power_long_shots",
+                                "Aggression": "$mentality_aggression",
+                                "Interceptions": "$mentality_interceptions",
+                                "Positioning": "$mentality_positioning",
+                                "Vision": "$mentality_vision",
+                                "Penalties": "$mentality_penalties",
+                                "Composure": "$mentality_composure",
+                                "Defensive Awareness": "$Defensive Awareness",
+                                "Standing Tackle": "$defending_standing_tackle",
+                                "Sliding Tackle": "$defending_sliding_tackle",
+                                "GK Diving": "$goalkeeping_diving",
+                                "GK Handling": "$goalkeeping_handling",
+                                "GK Kicking": "$goalkeeping_kicking",
+                                "GK Positioning": "$goalkeeping_positioning",
+                                "GK Reflexes": "$goalkeeping_reflexes"
+                            }
+                        }
+                    },
+                }}
+        ]
         results = list(mdb.aggregate(pipeline))
         return results
 
