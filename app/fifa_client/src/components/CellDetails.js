@@ -78,7 +78,6 @@ export default function CellDetails(props) {
             return "#E6B600"
         }
     }
-    console.log(details)
     let formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'EUR',
@@ -90,27 +89,27 @@ export default function CellDetails(props) {
     return (
         <>
             <Grid container>
-                <h3>{details["long_name"]} ({details["player_positions"]}) ({details["club"]})</h3>
+                <h3 className='text-2xl font-bold'>{details["long_name"]} ({details["player_positions"]}) ({details["club"]})</h3>
             </Grid>
-            <Grid container columns={3}>
-                <Grid>Value: {formatter.format(details["value"])}</Grid>
-                <Grid>Wage: {formatter.format(details["wage"])}</Grid>
-                <Grid>Release clause: {formatter.format(details["release_clause_eur"])}</Grid>
+            <Grid className='my-5' container columns={3}>
+                <Grid><span className='text-base font-semibold mr-1'>Value:</span>{formatter.format(details["value"])}</Grid>
+                <Grid><span className='text-base font-semibold mr-1'>Wage:</span>{formatter.format(details["wage"])}</Grid>
+                <Grid><span className='text-base font-semibold mr-1'>Release Clause:</span>{formatter.format(details["release_clause_eur"])}</Grid>
             </Grid>
-            <Grid container columns={4} spacing={10}>
+            <Grid className='mb-3' container columns={4} spacing={10}>
                 <Grid item>
-                    <h3>Profile</h3>
-                    <p>Potential: {details["potential"]}</p>
-                    <p>Preferred Foot: <strong>{details["preferred_foot"]}</strong></p>
-                    <p>Internation Reputation: ⭐{details["international_reputation"]}</p>
-                    <p>Weak Foot: ⭐{details["weak_foot"]}</p>
-                    <p>Skill Moves: ⭐{details["skill_moves"]}</p>
+                    <h3 className='font-bold text-xl mb-3'>Profile</h3>
+                    <p className='ml-2'>Potential: {details["potential"]}</p>
+                    <p className='ml-2'>Preferred Foot: <strong>{details["preferred_foot"]}</strong></p>
+                    <p className='ml-2'>Internation Reputation: ⭐{details["international_reputation"]}</p>
+                    <p className='ml-2'>Weak Foot: ⭐{details["weak_foot"]}</p>
+                    <p className='ml-2'>Skill Moves: ⭐{details["skill_moves"]}</p>
                 </Grid>
                 <Grid item>
-                    <h3>Specialties</h3>
+                    <h3 className='font-bold text-xl mb-3'>Specialties</h3>
                     {
                         tagFormatter(details["player_tags"]).map((e, i) => (
-                            <p key={i}>{e}</p>
+                            <p className='ml-2' key={i}>{e}</p>
                         ))
                     }
                 </Grid>

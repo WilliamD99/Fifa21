@@ -3,9 +3,9 @@ from dotenv import load_dotenv
 import os
 import streamlit as st
 
-load_dotenv()
-SRV = os.getenv("SRV")
-mdb = mongodb(srv_link=SRV)
+# load_dotenv()
+# SRV = os.getenv("SRV")
+mdb = mongodb(srv_link="mongodb+srv://willusermongodb:UdKdQ58Cg3Yg3tK@wills.hzswp.mongodb.net/myFirstDatabase?authSource=admin&replicaSet=atlas-98h30p-shard-0&w=majority&readPreference=primary&appname=MongoDB%20Compass&retryWrites=true&ssl=true")
 mdb.config("myFirstDatabase", "test")
 
 
@@ -100,10 +100,7 @@ class mdb_aggregate:
             }
         ]
         results = list(mdb.aggregate(pipeline))
-
         results_lst = [data["_id"] for data in results]
-        for data in results:
-            results_lst.append(data["_id"])
         return results_lst
 
     @st.experimental_memo
@@ -236,7 +233,6 @@ class mdb_aggregate:
         if club == "None" and pos == "None":
             return _self.get_players_from_country(country)
         elif club != "None" and pos == "None":
-            st.write("Test")
             pipeline = [
                 {
                     "$project": {

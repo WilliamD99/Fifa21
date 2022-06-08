@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "baseui": "^9.116.3"
+    "baseui": "^9.116.3",
+    "streamlit-component-lib": "^1.4.0"
   }
 }

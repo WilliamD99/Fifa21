@@ -1,14 +1,16 @@
 import React, { useEffect } from 'react'
 import { withStreamlitConnection, Streamlit } from 'streamlit-component-lib'
-import ST_Table from "./components/Table"
+import Table from "./components/Table"
 import "./styles/styles.css"
+import "./styles/tailwind.css"
+import "./styles/main.css"
 
 function App(props) {
-  useEffect(() => Streamlit.setFrameHeight("2000"))
-
+  useEffect(() => Streamlit.setFrameHeight("3000"))
+  
   return (
     <div>
-      <ST_Table props={props} />
+      <Table props={props} />
     </div>
   )
 }
